@@ -1,3 +1,7 @@
 # Version
 version = '0.0.1'
-description = 'enjoy beautiful debug tools.'
+
+from .utils import Dump
+from .settings import Setting
+setting = Setting()
+dump = Dump(setting=setting).run
