@@ -2,8 +2,8 @@ import codecs
 from setuptools import setup
 from BeautifulDebug import version
 
-readme = codecs.open('docs/README.md', encoding='utf-8').read()
-history = codecs.open('docs/HISTORY.md', encoding='utf-8').read()
+readme = codecs.open('README.md', encoding='utf-8').read()
+history = codecs.open('HISTORY.md', encoding='utf-8').read()
 
 setup(
     name='BeautifulDebug',
