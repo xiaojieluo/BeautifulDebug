@@ -30,6 +30,8 @@ class Dump(object):
             self.dump_str(obj, *args, **kw)
         elif isinstance(obj, dict):
             self.dump_dict(obj, *args, **kw)
+        elif isinstance(obj, list):
+            self.dump_list(obj, *args, **kw)
 
         # self.check_attribute(type_)
 
@@ -42,6 +44,9 @@ class Dump(object):
     def check(self):
         '''检查 obj 类型'''
         pass
+
+    def dump_list(self, obj, *args, **kw):
+        print('\t{}'.format(obj))
 
     def dump_None(self):
         print("None")
