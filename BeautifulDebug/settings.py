@@ -2,16 +2,24 @@
 class Setting(object):
     def __init__(self, debug=True,
                        date="%Y-%m-%d %H:%M:%S",
-                       separator='\n================'):
+                       separator='\n================',
+                       show_function = True):
         self._debug = debug
         self._date = date
         self._separator = separator
+        self._show_function = show_function
 
     def update(self, *args, **kw):
         '''更新配置'''
-        print(args)
-        print(kw)
-
+        # print("UPDATE")
+        for key, value in kw.items():
+            # print(key)
+            if hasattr(self, key):
+                setattr(self, key, value)
+                # print(d)
+        # print(args)
+        # print(kw)
+            # print(getattr(self, key))
     @property
     def debug(self):
         return self._debug
@@ -41,6 +49,20 @@ class Setting(object):
     @separator.setter
     def separator(self, value):
         self._separator = value
+
+    @property
+    def show_function(self):
+        '''
+        每条记录之间分隔符,
+        如果e设置为 None, 则没有分割符,
+        支持字符串, 转义字符
+        '''
+        return self._show_function
+
+    @show_function.setter
+    def show_function(self, value):
+        self._show_function = value
+
 
 
 if __name__ == '__main__':

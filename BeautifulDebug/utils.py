@@ -22,6 +22,8 @@ class Dump(object):
 
     def run(self, obj, *args, **kw):
         self.obj = obj
+        # print("UP")
+        self.setting.update(**kw)
         # 分隔符
         self.separator()
 
@@ -49,6 +51,11 @@ class Dump(object):
         elif isinstance(obj, types.ModuleType):
             self.dump_module(*args, **kw)
 
+        # 是否显示对象方法
+        if self.setting.show_function:
+            self.show_function()
+        # print(kw)
+        # self.show_function()
 
         # self.check_attribute(type_)
 
@@ -64,9 +71,6 @@ class Dump(object):
         # print(stack)
         update = []
         for i, s in enumerate(stack):
-            # print(index)
-            # if i < 3:
-            #     continue
             tmp = inspect.getframeinfo(s[0])
             update.append({
                 'filename': tmp[0],
@@ -92,6 +96,23 @@ class Dump(object):
         doc = "\t" + "\n\t".join(doc)
         print(Style.DIM + doc)
 
+        # function = []
+        # for name in self.obj.__dict__:
+        #     # 获取 attr 的文档
+        #     if name not in ATTR_MAP:
+        #         doc = inspect.getdoc(getattr(self.obj, name)).split('\n', 1)[0]
+        #         function.append({
+        #             'name': name,
+        #             'doc': doc
+        #         })
+        # # 显示数据
+        # print(Fore.YELLOW + "Function:")
+        # for func in function:
+        #     print(Fore.CYAN + "\t{} : \t".format(func['name']), end="")
+        #     print(Style.DIM + "{}".format(func['doc']))
+
+    def show_function(self):
+        '''显示对象函列表'''
         function = []
         for name in self.obj.__dict__:
             # 获取 attr 的文档
@@ -101,6 +122,7 @@ class Dump(object):
                     'name': name,
                     'doc': doc
                 })
+        # 显示数据
         print(Fore.YELLOW + "Function:")
         for func in function:
             print(Fore.CYAN + "\t{} : \t".format(func['name']), end="")
