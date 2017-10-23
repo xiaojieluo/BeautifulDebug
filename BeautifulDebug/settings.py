@@ -3,11 +3,13 @@ class Setting(object):
     def __init__(self, debug=True,
                        date="%Y-%m-%d %H:%M:%S",
                        separator='\n================',
-                       show_function = True):
+                       show_function = True,
+                       content = True):
         self._debug = debug
         self._date = date
         self._separator = separator
         self._show_function = show_function
+        self._content = content
 
     def update(self, *args, **kw):
         '''更新配置'''
@@ -62,6 +64,11 @@ class Setting(object):
     @show_function.setter
     def show_function(self, value):
         self._show_function = value
+
+    @property
+    def content(self):
+        '''是否显示变量内容'''
+        return self._content
 
 
 
