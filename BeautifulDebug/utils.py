@@ -6,23 +6,22 @@ from colorama import Fore, Back, Style, init
 import types
 import inspect
 from .defines import ATTR_MAP, ATTR_EXCEPTION_MAP
-# from .defines import ATTR_MAP
 import pprint
-# print(sys.path)
-# import define
+import parser
+import cProfile
+import pstats
+import tracemalloc
 
-# SPECIAL_ATTRIBUTE = [
-#     '__doc__'
-# ]
+
 init(autoreset=True)
 
 class Dump(object):
     def __init__(self, setting={}):
-        self.setting = Setting()
+        self.setting = setting
+        self.content = None
 
     def run(self, obj, *args, **kw):
         self.obj = obj
-        # print("UP")
         self.setting.update(**kw)
         # 分隔符
         self.separator()
@@ -36,8 +35,9 @@ class Dump(object):
         print(Fore.YELLOW + 'type:')
         print(Fore.CYAN + '\t{}'.format(type_))
 
-        print(Fore.YELLOW + 'content:')
-        print(inspect.isclass(obj))
+        print(Fore.YELLOW + 'Address: ')
+        print(Fore.CYAN + '\t{}'.format(id(self.obj)))
+
         if obj is None:
             self.dump_None()
         elif inspect.isclass(obj):
@@ -50,14 +50,21 @@ class Dump(object):
             self.dump_list(*args, **kw)
         elif isinstance(obj, types.ModuleType):
             self.dump_module(*args, **kw)
+        elif isinstance(obj, types.FunctionType):
+            self.dump_function(*args, **kw)
+
+        if self.content is not None and self.setting.content is True:
+            print(Fore.YELLOW + 'content:')
+            print(self.content)
 
         # 是否显示对象方法
-        if self.setting.show_function:
+        if self.setting.show_function is True:
+            print("Function")
             self.show_function()
-        # print(kw)
-        # self.show_function()
 
-        # self.check_attribute(type_)
+    def dump_function(self, *args, **kw):
+        '''调试 函数'''
+        pass
 
     def separator(self):
         '''显示分隔符'''
@@ -113,15 +120,20 @@ class Dump(object):
 
     def show_function(self):
         '''显示对象函列表'''
+
+        profile = cProfile.run(self.obj)
+        print(pstats.Stats(profile).print_callees(self.obj))
         function = []
-        for name in self.obj.__dict__:
-            # 获取 attr 的文档
+        for name_tup in inspect.getmembers(self.obj):
+            name, text = name_tup
+                # 获取 attr 的文档
             if name not in ATTR_MAP:
                 doc = inspect.getdoc(getattr(self.obj, name)).split('\n', 1)[0]
                 function.append({
                     'name': name,
                     'doc': doc
                 })
+
         # 显示数据
         print(Fore.YELLOW + "Function:")
         for func in function:
@@ -133,7 +145,8 @@ class Dump(object):
         pass
 
     def dump_list(self, *args, **kw):
-        print('\t{}'.format(self.obj))
+        '''调试列表'''
+        self.content = Fore.CYAN + '\t{}'.format(self.obj)
 
     def dump_None(self):
         print("None")
@@ -144,17 +157,19 @@ class Dump(object):
         pass
 
     def dump_dict(self, *args, **kw):
-        # print('\t{}{}'.format(Fore.CYAN, obj))
-        print('\t{')
+        '''调试字典'''
+        content = Fore.CYAN + '\t{\n'
         for key, value in self.obj.items():
-            print("\t   '{}'".format(key), end='')
-            print(" : ", end='')
+            content += Fore.CYAN + "\t   '{}'".format(key)
+            content += Fore.CYAN + " : "
             format_ = "'{}'"
             if isinstance(value, int):
                 format_ = "{}"
-            print(format_.format(value))
+            content += Fore.CYAN + format_.format(value) + '\n'
 
-        print('\t}')
+        content += Fore.CYAN + '\t}'
+
+        self.content = content
 
     def dump_module(self,*args, **kw):
         ''' 模块'''
@@ -162,12 +177,7 @@ class Dump(object):
 
     def dump_str(self, *args, **kw):
         ''' 字符串 '''
-        # try:
-        print('s' + self.obj.__str__())
-            # except Except
-        print(inspect.getsourcefile(self.obj))
-        print(Fore.YELLOW+"content:")
-        print(Fore.CYAN + '\t{}'.format(self.obj))
+        self.content = Fore.CYAN + '\t{}'.format(self.obj)
 
     def check_attribute(self):
         '''显示对象的方法'''
@@ -179,16 +189,6 @@ class Dump(object):
             print(Fore.CYAN + key+ ':\t', end='')
             if doc is not None:
                 print(Style.DIM + doc)
-
-
-        # print(Fore.YELLOW + 'arithmetic:')
-        # self.show_arthmetic(arithmetic, separator='\t{} ', detail=False)
-        # print('\n'+Fore.YELLOW + 'Function:')
-        # self.show_arthmetic(function)
-                # print('\t'+Fore.YELLOW + key + ':\t', end='')
-                # print(Style.DIM + str(value))
-
-    # def show_function(data):
 
     def show_arthmetic(self, data, separator = '\t{}:\t', detail = True):
         '''显示操作符'''
